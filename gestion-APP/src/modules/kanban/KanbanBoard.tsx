@@ -333,27 +333,6 @@ const guardarNombreChecklist = async (index: number) => {
     alert('Error al actualizar nombre del ítem');
   }
 };
-const handleGuardarCambios = () => {
-  if (!token) {
-      // Puedes redirigir al login o mostrar un error
-      return <div>No autenticado</div>;
-    }
-  editarCardMutate(
-    {
-      token,
-      cardId: tareaSeleccionada!.id,
-      titulo: nuevoTitulo,
-      descripcion: nuevaDescripcion,
-    },
-    {
-      onSuccess: async () => {
-        // Refresca la card desde la API
-        const cardActualizada = await obtenerCardPorId(token, tareaSeleccionada!.listaId, tareaSeleccionada!.id);
-        setTareaSeleccionada(cardActualizada);
-      },
-    }
-  );
-};
 return (
   <Layout>
     <div className="flex min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
