@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import PlanificadorIA from "../../components/PlanificadorIA";
 import { useQuery, useQueries, useQueryClient } from '@tanstack/react-query';
 import { useEditarCard, useEliminarCard } from '../../hooks/useCardMutations';
 import { useEditarLista, useEliminarLista } from '../../hooks/useListMutations';
@@ -79,15 +80,15 @@ export const KanbanBoard = () => {
   const [editandoCard, setEditandoCard] = useState(false);
   const [nuevoTitulo, setNuevoTitulo] = useState('');
   const [nuevaDescripcion, setNuevaDescripcion] = useState('');
-  
 
   const obtenerProgresoChecklist = (checklist?: ChecklistItem[]) => {
-  if (!checklist || checklist.length === 0) return null;
+    if (!checklist || checklist.length === 0) return null;
 
-  const completados = checklist.filter((item) => item.completado).length;
-  const total = checklist.length;
-  return `${completados}/${total}`;
-};
+    const completados = checklist.filter((item) => item.completado).length;
+    const total = checklist.length;
+    return `${completados}/${total}`;
+  };
+  
 
 
 
@@ -333,6 +334,16 @@ const guardarNombreChecklist = async (index: number) => {
     alert('Error al actualizar nombre del ítem');
   }
 };
+
+const handlePlanificacionCompletada = () => {
+  // Refresca las listas y las cards del proyecto
+  queryClient.invalidateQueries({ queryKey: ['listas', id] });
+  // Refresca todas las cards de todas las listas
+  listas.forEach((lista: Lista) => {
+    queryClient.invalidateQueries({ queryKey: ['cards', lista._id] });
+  });
+};
+
 return (
   <Layout>
     <div className="flex min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
@@ -348,7 +359,7 @@ return (
 
         <h1 className="text-3xl font-bold mb-6">🗂️ Tablero Kanban</h1>
         {error && <p className="text-red-500 dark:text-red-400">{error}</p>}
-
+        {/* Chat IA arriba del tablero */}
         <DragDropContext onDragEnd={handleDragEnd}>
           {/* SCROLL HORIZONTAL: flex-1 y overflow-x-auto en main, w-max aquí */}
           <div className="w-full overflow-x-auto pb-4">
@@ -585,7 +596,11 @@ return (
             </button>
           </form>
         </div>
-
+        <PlanificadorIA
+          proyectoId={id!}
+          token={token ?? undefined} // <-- Así nunca será null, solo string o undefined
+          onPlanificacionCompletada={handlePlanificacionCompletada}
+        />      
         {/* Modal de detalle de tarea */}
         {tareaSeleccionada && (
           <div data-testid="modal-tarea" className="fixed inset-0 bg-black/10 backdrop-blur-sm flex justify-center items-center z-50">
