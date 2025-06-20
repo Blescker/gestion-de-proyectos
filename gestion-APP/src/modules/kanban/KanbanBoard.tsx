@@ -81,6 +81,7 @@ export const KanbanBoard = () => {
   const [nuevoTitulo, setNuevoTitulo] = useState('');
   const [nuevaDescripcion, setNuevaDescripcion] = useState('');
 
+  const [mostrarIA, setMostrarIA] = useState(false);
   const obtenerProgresoChecklist = (checklist?: ChecklistItem[]) => {
     if (!checklist || checklist.length === 0) return null;
 
@@ -596,11 +597,26 @@ return (
             </button>
           </form>
         </div>
-        <PlanificadorIA
-          proyectoId={id!}
-          token={token ?? undefined} // <-- Así nunca será null, solo string o undefined
-          onPlanificacionCompletada={handlePlanificacionCompletada}
-        />      
+         {/* Botón para abrir/cerrar IA */}
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => setMostrarIA(!mostrarIA)}
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold py-2 px-6 rounded-full shadow transition"
+            >
+              {mostrarIA ? "🔽 Cerrar asistente IA" : "🤖 ¿Necesitas ayuda para planificar? Usa IA"}
+            </button>
+          </div>
+
+          {/* Chat IA visible solo si mostrarIA es true */}
+          {mostrarIA && (
+            <div className="mt-6">
+              <PlanificadorIA
+                proyectoId={id!}
+                token={token ?? undefined}
+                onPlanificacionCompletada={handlePlanificacionCompletada}
+              />
+            </div>
+          )}    
         {/* Modal de detalle de tarea */}
         {tareaSeleccionada && (
           <div data-testid="modal-tarea" className="fixed inset-0 bg-black/10 backdrop-blur-sm flex justify-center items-center z-50">
