@@ -80,7 +80,8 @@ export const KanbanBoard = () => {
   const [editandoCard, setEditandoCard] = useState(false);
   const [nuevoTitulo, setNuevoTitulo] = useState('');
   const [nuevaDescripcion, setNuevaDescripcion] = useState('');
-
+  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
+  
   const [mostrarIA, setMostrarIA] = useState(false);
   const obtenerProgresoChecklist = (checklist?: ChecklistItem[]) => {
     if (!checklist || checklist.length === 0) return null;
@@ -412,18 +413,41 @@ return (
                             title="Editar lista"
                           >✏️</button>
                           <button
-                            onClick={() => {
-                              if (window.confirm('¿Eliminar esta lista y todas sus tarjetas?')) {
-                                if (!token) {
-                                  // Puedes redirigir al login o mostrar un error
-                                  return <div>No autenticado</div>;
-                                }
-                                eliminarListaMutate({ token, listaId: lista._id });
-                              }
-                            }}
+                            onClick={() => setMostrarConfirmacion(true)}
                             className="text-red-500 hover:text-red-700"
                             title="Eliminar lista"
-                          >🗑️</button>
+                          >
+                            🗑️
+                          </button>
+                          {mostrarConfirmacion && (
+                            <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+                              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-sm">
+                                <h3 className="text-lg font-semibold mb-4 text-center">¿Estás seguro?</h3>
+                                <p className="text-sm mb-6 text-center">
+                                  Esto eliminará la lista y todas sus tarjetas asociadas. Esta acción no se puede deshacer.
+                                </p>
+
+                                <div className="flex justify-center gap-4">
+                                  <button
+                                    onClick={() => setMostrarConfirmacion(false)}
+                                    className="px-4 py-2 rounded bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-black dark:text-white text-sm"
+                                  >
+                                    Cancelar
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      if (!token) return;
+                                      eliminarListaMutate({ token, listaId: lista._id });
+                                      setMostrarConfirmacion(false);
+                                    }}
+                                    className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white text-sm"
+                                  >
+                                    Eliminar
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </>
                       )}
                     </h2>
