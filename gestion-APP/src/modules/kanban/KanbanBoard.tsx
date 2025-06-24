@@ -80,7 +80,7 @@ export const KanbanBoard = () => {
   const [editandoCard, setEditandoCard] = useState(false);
   const [nuevoTitulo, setNuevoTitulo] = useState('');
   const [nuevaDescripcion, setNuevaDescripcion] = useState('');
-  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
+  const [listaAEliminar, setListaAEliminar] = useState<string | null>(null);
   
   const [mostrarIA, setMostrarIA] = useState(false);
   const obtenerProgresoChecklist = (checklist?: ChecklistItem[]) => {
@@ -413,32 +413,34 @@ return (
                             title="Editar lista"
                           >✏️</button>
                           <button
-                            onClick={() => setMostrarConfirmacion(true)}
-                            className="text-red-500 hover:text-red-700"
+                            onClick={() => setListaAEliminar(lista._id)}
+                            className="ml-2 text-red-500 hover:text-red-700"
                             title="Eliminar lista"
                           >
                             🗑️
                           </button>
-                          {mostrarConfirmacion && (
+                          {listaAEliminar === lista._id && (
                             <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
                               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-sm">
-                                <h3 className="text-lg font-semibold mb-4 text-center">¿Estás seguro?</h3>
+                                <h3 className="text-lg font-semibold mb-4 text-center">
+                                  ¿Estás seguro?
+                                </h3>
                                 <p className="text-sm mb-6 text-center">
                                   Esto eliminará la lista y todas sus tarjetas asociadas. Esta acción no se puede deshacer.
                                 </p>
 
                                 <div className="flex justify-center gap-4">
                                   <button
-                                    onClick={() => setMostrarConfirmacion(false)}
+                                    onClick={() => setListaAEliminar(null)}
                                     className="px-4 py-2 rounded bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-black dark:text-white text-sm"
                                   >
                                     Cancelar
                                   </button>
                                   <button
                                     onClick={() => {
-                                      if (!token) return;
-                                      eliminarListaMutate({ token, listaId: lista._id });
-                                      setMostrarConfirmacion(false);
+                                      if (!token || !listaAEliminar) return;
+                                      eliminarListaMutate({ token, listaId: listaAEliminar });
+                                      setListaAEliminar(null);
                                     }}
                                     className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white text-sm"
                                   >

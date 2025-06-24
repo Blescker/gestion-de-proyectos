@@ -3,6 +3,7 @@ import axios from 'axios';
 import { List } from '../models/List.js';
 import { Card } from '../models/Card.js';
 import { Project } from '../models/Project.js';
+const LANGCHAIN_URL = process.env.LANGCHAIN_URL || 'http://192.168.18.11:5001';
 
 export const generarPlan = async (req, res) => {
   const { descripcion, proyectoId } = req.body;
@@ -13,7 +14,7 @@ export const generarPlan = async (req, res) => {
 
   try {
     // 1. Enviar mensaje a la IA (Flask/LangChain)
-    const respuesta = await axios.post('http://langchain:5001/planificar', {
+    const respuesta = await axios.post(`${LANGCHAIN_URL}/planificar`, {
       mensaje: descripcion,
       sesion_id: req.user._id
     });
