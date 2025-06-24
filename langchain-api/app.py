@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 # Configurar Flask y entorno
 load_dotenv()
 app = Flask(__name__)
-llm = ChatOpenAI(model='gpt-4-turbo', temperature=0.5)
+llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0.5)
 
 # Historial por sesión
 conversaciones = {}
