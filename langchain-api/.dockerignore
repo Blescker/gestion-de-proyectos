@@ -1,0 +1,44 @@
+# Ignorar control de versiones
+.git
+.gitignore
+
+# Archivos y carpetas de entorno virtual y dependencias locales
+.env
+.venv/
+venv/
+env/
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos temporales y logs
+*.log
+*.tmp
+*.swp
+*.bak
+
+# Cachés y reportes de tests
+.pytest_cache/
+.coverage
+nosetests.xml
+coverage.xml
+htmlcov/
+
+# Documentación generada
+docs/_build/
+
+# Archivos de configuración locales y editores
+.vscode/
+.idea/
+*.iml
+
+# Archivos de Docker locales
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Otros archivos que no quieres en la imagen (excepto requirements.txt)
+*.md
+
