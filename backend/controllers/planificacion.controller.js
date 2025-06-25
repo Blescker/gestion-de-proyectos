@@ -20,7 +20,7 @@ async function llamarLangChainConReintentos(data, intentos = 3, delay = 2000) {
       if (
         error.code === 'ECONNREFUSED' ||
         error.code === 'ECONNABORTED' ||
-        (error.response && error.response.status >= 500)
+        (error.response && [502, 503, 504].includes(error.response.status))
       ) {
         await new Promise((res) => setTimeout(res, delay));
         delay *= 2; // backoff exponencial
