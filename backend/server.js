@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import http from 'http';
 import {Server} from 'socket.io'
+import path from 'path';
 
 import authRoutes from './routes/auth.routes.js';
 import projectRoutes from './routes/project.routes.js';
@@ -20,7 +21,13 @@ import { User } from './models/User.js';
 dotenv.config();
 
 const app = express();
+// Servir archivos estáticos de React (ajusta la ruta a tu carpeta build)
+app.use(express.static(path.join(__dirname, 'client/dist')));
 
+// Ruta catch-all para React Router
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
+});
 // Middlewares
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
