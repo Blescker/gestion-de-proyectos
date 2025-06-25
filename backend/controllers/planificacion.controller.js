@@ -17,7 +17,9 @@ export const generarPlan = async (req, res) => {
     const respuesta = await axios.post(`${LANGCHAIN_URL}/planificar`, {
       mensaje: descripcion,
       sesion_id: req.user._id
-    });
+    },
+    { timeout: 30000 }
+  );
 
     const mensajeIA = respuesta.data.respuesta;
 
