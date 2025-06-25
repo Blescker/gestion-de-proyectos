@@ -36,8 +36,10 @@ app.use('/api/users', userRoutes);
 app.use('/api', planificacionRoutes);
 
 app.use(express.static(path.join(__dirname, '../gestion-APP/dist')));
-app.get('/*', (req,res) => {
-  res.sendFile(path.join(__dirname, '../gestion-APP/dist/index.html'));
+app.get(/.*/, (req, res) => {
+  res.sendFile(
+    path.join(__dirname, '../gestion-APP/dist', 'index.html')
+  );
 });
 // Conectar a MongoDB
 mongoose
