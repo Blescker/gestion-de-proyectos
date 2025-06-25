@@ -3,7 +3,35 @@ import axios from 'axios';
 import { List } from '../models/List.js';
 import { Card } from '../models/Card.js';
 import { Project } from '../models/Project.js';
+
 const LANGCHAIN_URL = process.env.LANGCHAIN_URL || 'http://192.168.18.11:5001';
+
+// Función auxiliar para reintentos con backoff exponencial
+async function llamarLangChainConReintentos(data, intentos = 3, delay = 2000) {
+  let lastError;
+  for (let i = 0; i < intentos; i++) {
+    try {
+      return await axios.post(`${LANGCHAIN_URL}/planificar`, data, { timeout: 30000 });
+    } catch (error) {
+      lastError = error;
+      // Si es el último intento, lanza el error
+      if (i === intentos - 1) throw error;
+      // Solo reintenta si es error de red o timeout o 5xx
+      if (
+        error.code === 'ECONNREFUSED' ||
+        error.code === 'ECONNABORTED' ||
+        (error.response && error.response.status >= 500)
+      ) {
+        await new Promise((res) => setTimeout(res, delay));
+        delay *= 2; // backoff exponencial
+      } else {
+        // Otros errores no se reintentan
+        throw error;
+      }
+    }
+  }
+  throw lastError;
+}
 
 export const generarPlan = async (req, res) => {
   const { descripcion, proyectoId } = req.body;
@@ -13,20 +41,17 @@ export const generarPlan = async (req, res) => {
   }
 
   try {
-    // 1. Enviar mensaje a la IA (Flask/LangChain)
-    const respuesta = await axios.post(`${LANGCHAIN_URL}/planificar`, {
+    // 1. Enviar mensaje a la IA (Flask/LangChain) con reintentos
+    const respuesta = await llamarLangChainConReintentos({
       mensaje: descripcion,
       sesion_id: req.user._id
-    },
-    { timeout: 30000 }
-  );
+    });
 
     const mensajeIA = respuesta.data.respuesta;
 
     // 2. Intentar parsear el JSON si existe
     let planJSON = null;
     try {
-      // Busca un bloque JSON en la respuesta de la IA
       const match = mensajeIA.match(/\{[\s\S]*\}/);
       if (match) planJSON = JSON.parse(match[0]);
     } catch (e) {
@@ -37,14 +62,12 @@ export const generarPlan = async (req, res) => {
     if (planJSON && planJSON.listas) {
       const creadas = [];
       for (const lista of planJSON.listas) {
-        // Crea la lista
         const nuevaLista = new List({
           nombre: lista.nombre,
           proyectoId,
         });
         const listaGuardada = await nuevaLista.save();
 
-        // Crea las tareas/cards de la lista
         for (const tarea of (lista.tareas || [])) {
           const nuevaCard = new Card({
             titulo: tarea.titulo,
@@ -63,6 +86,17 @@ export const generarPlan = async (req, res) => {
 
   } catch (error) {
     console.error('Error en /api/planificar:', error);
-    res.status(500).json({ msg: 'No se pudo generar la planificación' });
+
+    // Manejo de errores específico
+    if (error.code === 'ECONNREFUSED') {
+      return res.status(503).json({ msg: 'No se pudo conectar con la IA. Puede estar apagada, dormida o en proceso de arranque.' });
+    }
+    if (error.code === 'ECONNABORTED') {
+      return res.status(504).json({ msg: 'La IA tardó demasiado en responder. Puede estar dormida, intenta en unos segundos.' });
+    }
+    if (error.response && error.response.status === 404) {
+      return res.status(502).json({ msg: 'El endpoint de la IA no fue encontrado (404).' });
+    }
+    return res.status(500).json({ msg: 'No se pudo generar la planificación por un error interno.' });
   }
 };
