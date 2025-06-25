@@ -35,10 +35,11 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api', planificacionRoutes);
 
-// Servir archivos estáticos de React (ajusta la ruta a tu carpeta build)
-app.use(express.static(path.join(__dirname, 'client/dist')));
-// Ruta catch-all para React Router
-app.get('*', (req, res) => {
+// Sirve estáticos primero
+app.use(express.static(path.join(__dirname, 'client', 'dist')));
+
+// Catch-all: cualquier ruta
+app.get('/*splat', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
 });
 // Conectar a MongoDB
