@@ -22,13 +22,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config();
 
 const app = express();
-// Servir archivos estáticos de React (ajusta la ruta a tu carpeta build)
-app.use(express.static(path.join(__dirname, 'client/dist')));
 
-// Ruta catch-all para React Router
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
-});
 // Middlewares
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -41,6 +35,12 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api', planificacionRoutes);
 
+// Servir archivos estáticos de React (ajusta la ruta a tu carpeta build)
+app.use(express.static(path.join(__dirname, 'client/dist')));
+// Ruta catch-all para React Router
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
+});
 // Conectar a MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
