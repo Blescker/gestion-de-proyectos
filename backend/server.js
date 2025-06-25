@@ -35,11 +35,9 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api', planificacionRoutes);
 
-// Sirve estáticos primero
 app.use(express.static(path.join(__dirname, 'client', 'dist')));
 
-// Catch-all: cualquier ruta
-app.get('/*splat', (req, res) => {
+app.get(/.*/, (req, res) => {
   res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
 });
 // Conectar a MongoDB
