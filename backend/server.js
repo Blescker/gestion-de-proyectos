@@ -35,11 +35,19 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api', planificacionRoutes);
 
-app.use(express.static(path.join(__dirname, '../client/dist')));
+// 2) Sirve los ficheros estáticos de tu build de React/Vite
+app.use(
+  express.static(
+    path.join(__dirname, '../gestion-APP/dist')
+  )
+);
 
-// 2) catch-all para React Router
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
+// 3) **Catch-all** para React Router, usando **regex**
+//     Esto atrapa TODO y envía tu index.html sin quebrar path-to-regexp.
+app.get(/.*/, (req, res) => {
+  res.sendFile(
+    path.join(__dirname, '../gestion-APP/dist', 'index.html')
+  );
 });
 // Conectar a MongoDB
 mongoose
