@@ -4,8 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import http from 'http';
 import {Server} from 'socket.io'
-import path from 'path';
-import { fileURLToPath } from 'url';
+
 import authRoutes from './routes/auth.routes.js';
 import projectRoutes from './routes/project.routes.js';
 import listRoutes from './routes/list.routes.js';
@@ -21,8 +20,6 @@ import { User } from './models/User.js';
 dotenv.config();
 
 const app = express();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 // Middlewares
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -35,20 +32,6 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api', planificacionRoutes);
 
-// 2) Sirve los ficheros estáticos de tu build de React/Vite
-app.use(
-  express.static(
-    path.join(__dirname, '../gestion-APP/dist')
-  )
-);
-
-// 3) **Catch-all** para React Router, usando **regex**
-//     Esto atrapa TODO y envía tu index.html sin quebrar path-to-regexp.
-app.get(/.*/, (req, res) => {
-  res.sendFile(
-    path.join(__dirname, '../gestion-APP/dist', 'index.html')
-  );
-});
 // Conectar a MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
