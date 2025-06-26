@@ -17,12 +17,12 @@ import planificacionRoutes from './routes/planificacion.routes.js';
 import { Message } from './models/Message.js';
 import { Project } from './models/Project.js';
 import { User } from './models/User.js';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+
 dotenv.config();
 
 const app = express();
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 // Middlewares
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -35,7 +35,14 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api', planificacionRoutes);
 
-app.use(express.static(path.join(__dirname, '../gestion-APP/dist')));
+// 1️⃣ Sirve los estáticos de tu React build
+app.use(
+  express.static(
+    path.join(__dirname, '../gestion-APP/dist')
+  )
+);
+
+// 2️⃣ Catch-all para React Router (regex para evitar el error de path-to-regexp)
 app.get(/.*/, (req, res) => {
   res.sendFile(
     path.join(__dirname, '../gestion-APP/dist', 'index.html')
