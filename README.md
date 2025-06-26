@@ -153,6 +153,304 @@ Estas variables permiten una fácil configuración para despliegue local y remot
 
 ---
 
+# 📘 Documentación de API - PGP-IA-TP2
+
+Todas las rutas están protegidas por JWT. Agrega este header en cada petición:
+
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+---
+
+## 🔐 Autenticación
+
+### 🟢 POST /api/auth/register
+
+Crea un nuevo usuario.
+
+**Body:**
+
+```json
+{
+  "nombre": "Blesscker",
+  "correo": "blesscker@demo.com",
+  "password": "123456"
+}
+```
+
+**Respuestas:**
+
+- 201 Created:
+
+```json
+{ "msg": "Usuario registrado correctamente" }
+```
+
+- 400 / 500: Campos faltantes, duplicados o errores internos
+
+### 🔐 POST /api/auth/login
+
+Inicia sesión, devuelve token JWT.
+
+**Body:**
+
+```json
+{
+  "correo": "blesscker@demo.com",
+  "password": "123456"
+}
+```
+
+**Respuesta exitosa:**
+
+```json
+{
+  "msg": "Login exitoso",
+  "token": "...",
+  "usuario": { "id": "...", "nombre": "Blesscker", "correo": "..." }
+}
+```
+
+---
+
+## 📁 Proyectos
+
+### 📌 POST /api/projects
+
+Crea un nuevo proyecto
+
+**Body:**
+
+```json
+{ "nombre": "Mi proyecto", "descripcion": "Opcional" }
+```
+
+### 📌 GET /api/projects
+
+Lista proyectos donde eres miembro
+
+### 📌 GET /api/projects/:id
+
+Obtiene detalles de un proyecto
+
+### 📌 PUT /api/projects/:id
+
+Edita nombre o descripción
+
+### 📌 DELETE /api/projects/:id
+
+Elimina el proyecto (solo propietario)
+
+### 📌 POST /api/projects/:id/members
+
+Agrega miembro por correo
+
+**Body:**
+
+```json
+{ "correo": "correo@demo.com", "rol": "colaborador" }
+```
+
+### 📌 GET /api/projects/:id/members
+
+Lista los miembros del proyecto
+
+### 📌 DELETE /api/projects/:id/members/:memberId
+
+Elimina un miembro del proyecto
+
+---
+
+## 🗂️ Listas (Kanban)
+
+### ✅ POST /api/projects/:id/listas
+
+Crea una lista en el proyecto
+
+**Body:**
+
+```json
+{ "nombre": "To Do", "posicion": 0 }
+```
+
+### ✅ GET /api/projects/:id/listas
+
+Obtiene todas las listas del proyecto
+
+---
+
+## 📌 Tarjetas
+
+### ✅ POST /api/listas/:id/tarjetas
+
+Crea una tarjeta en una lista
+
+**Body:**
+
+```json
+{
+  "titulo": "Crear API",
+  "descripcion": "JWT + validación",
+  "fechaInicio": "2025-05-15",
+  "fechaFin": "2025-05-20"
+}
+```
+
+### ✅ GET /api/listas/:id/tarjetas
+
+Lista todas las tarjetas de una lista
+
+### ✅ PUT /api/cards/:id
+
+Editar título, descripción y fechas
+
+### ✅ PATCH /api/tarjetas/:id/mover
+
+Mover tarjeta a otra lista
+
+**Body:**
+
+```json
+{ "nuevaListaId": "..." }
+```
+
+### ✅ PATCH /api/tarjetas/:id/completada
+
+Cambiar estado de completada
+
+**Body:**
+
+```json
+{ "completada": true }
+```
+
+---
+
+## ✅ Asignaciones y Etiquetas
+
+### ✅ PUT /api/cards/:id/assign
+
+Asignar miembros a una tarjeta
+
+**Body:**
+
+```json
+{ "miembros": ["userId1", "userId2"] }
+```
+
+### ✅ PATCH /api/cards/:id/etiquetas
+
+Agregar etiqueta
+
+```json
+{ "nombre": "Urgente", "color": "#ff0000" }
+```
+
+### ✅ DELETE /api/cards/:id/etiquetas/:index
+
+Eliminar etiqueta por índice
+
+---
+
+## ✅ Checklist
+
+### ✅ PATCH /api/cards/:id/checklist
+
+Agregar ítem
+
+**Body:**
+
+```json
+{ "nombre": "Hacer login" }
+```
+
+### ✅ PATCH /api/cards/:id/checklist/:index
+
+Actualizar completado
+
+```json
+{ "completado": true }
+```
+
+### ✅ DELETE /api/cards/:id/checklist/:index
+
+Eliminar ítem del checklist
+
+---
+
+## 📎 Adjuntos
+
+### ✅ PATCH /api/cards/:id/adjuntos
+
+Agregar link
+
+```json
+{ "nombre": "Documento", "url": "https://..." }
+```
+
+### ✅ DELETE /api/cards/:id/adjuntos/:index
+
+Eliminar link
+
+---
+
+## 💬 Mensajes
+
+### ✅ POST /api/messages
+
+Guardar mensaje de chat
+
+```json
+{ "contenido": "Hola", "proyectoId": "..." }
+```
+
+### ✅ GET /api/messages/:proyectoId
+
+Obtener todos los mensajes
+
+---
+
+## 👤 Usuario
+
+### ✅ GET /api/users/me
+
+Obtiene tus datos
+
+### ✅ PATCH /api/users/avatar
+
+Actualizar avatar
+
+```json
+{ "avatar": "https://..." }
+```
+
+### ✅ PATCH /api/users/profile
+
+Actualizar nombre/apellido
+
+```json
+{ "nombre": "Nuevo", "apellido": "Apellido" }
+```
+
+### ✅ PATCH /api/users/password
+
+Cambiar contraseña
+
+```json
+{ "passwordActual": "123", "nuevaPassword": "456" }
+```
+
+---
+
+## 📝 Notas
+
+- Todas las rutas usan middleware `protect`
+- El token JWT debe ir en los headers
+- Las tarjetas dependen de listas, las listas dependen de proyectos
+- Solo el propietario puede editar/eliminar proyectos y miembros
+
 ## 👨‍💻 Autor
 
 **Braulio Cesar Ortega Batalla**  
