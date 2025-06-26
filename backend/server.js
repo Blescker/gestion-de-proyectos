@@ -35,18 +35,11 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api', planificacionRoutes);
 
-// 1️⃣ Sirve los estáticos de tu React build
-app.use(
-  express.static(
-    path.join(__dirname, '../gestion-APP/dist')
-  )
-);
+app.use(express.static(path.join(__dirname, '../client/dist')));
 
-// 2️⃣ Catch-all para React Router (regex para evitar el error de path-to-regexp)
-app.get(/.*/, (req, res) => {
-  res.sendFile(
-    path.join(__dirname, '../gestion-APP/dist', 'index.html')
-  );
+// 2) catch-all para React Router
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
 });
 // Conectar a MongoDB
 mongoose
