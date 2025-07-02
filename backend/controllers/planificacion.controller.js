@@ -4,7 +4,7 @@ import { List } from '../models/List.js';
 import { Card } from '../models/Card.js';
 import { Project } from '../models/Project.js';
 
-const LANGCHAIN_URL = process.env.LANGCHAIN_URL || 'http://192.168.18.11:5001';
+const LANGCHAIN_URL = process.env.LANGCHAIN_URL || 'http://192.168:5001';
 
 // Función auxiliar para reintentos con backoff exponencial
 async function llamarLangChainConReintentos(data, intentos = 3, delay = 2000) {
@@ -52,10 +52,13 @@ export const generarPlan = async (req, res) => {
     // 2. Intentar parsear el JSON si existe
     let planJSON = null;
     try {
-      const match = mensajeIA.match(/\{[\s\S]*\}/);
-      if (match) planJSON = JSON.parse(match[0]);
+      const jsonMatch = mensajeIA.match(/```json\n([\s\S]*?)\n```/) || mensajeIA.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const jsonString = jsonMatch[1] || jsonMatch[0];
+        planJSON = JSON.parse(jsonString);
+      }
     } catch (e) {
-      // No hay JSON, solo explicación
+      console.error("Error al parsear JSON de la IA:", e);
     }
 
     // 3. Si hay JSON, crear listas y tareas
