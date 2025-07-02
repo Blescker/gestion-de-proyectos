@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 # Configurar Flask y entorno
 load_dotenv()
 app = Flask(__name__)
-llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0.5)
+llm = ChatOpenAI(model='gpt-4o', temperature=0.5)
 
 # Historial por sesión
 conversaciones = {}
@@ -36,7 +36,11 @@ Tu único objetivo es:
 - Si la respuesta es ambigua ("tal vez", "mmm", "no sé"), solicita una aclaración o haz sugerencias concretas.
 - Cuando el usuario confirme, debes responder exclusivamente con el JSON —sin explicaciones ni texto adicional— y NO debes mencionar que estás generando un JSON ni dar contexto.
 - Después de confirmar y generar el JSON, no debes hacer más preguntas ni continuar la conversación.
-
+- Debes tener en cuenta que debes sugerirle las listas, tareas solamente
+internamente tu genera las checklist y etiquetas para cada tarea
+Cuando confirmes, responde solo con el JSON en este formato exacto, sin
+explicaciones ni texto adicional, importante! no le debes mencionar al
+usuario que vas a generar un JSON:
 📦 Formato del JSON que debes generar (estrictamente este, sin modificarlo):
 
 {
@@ -55,7 +59,6 @@ Tu único objetivo es:
             { "nombre": "Ítem del checklist", "completado": false }
           ]
         }
-        // Al menos 4 tareas por lista
       ]
     }
     // Puedes generar varias listas si es relevante al proyecto
