@@ -11,7 +11,7 @@ async function llamarLangChainConReintentos(data, intentos = 3, delay = 2000) {
   let lastError;
   for (let i = 0; i < intentos; i++) {
     try {
-      return await axios.post(`${LANGCHAIN_URL}/planificar`, data, { timeout: 30000 });
+      return await axios.post(`${LANGCHAIN_URL}/planificar`, data, { timeout: 60000 });
     } catch (error) {
       lastError = error;
       // Si es el último intento, lanza el error

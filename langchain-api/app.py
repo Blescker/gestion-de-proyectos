@@ -63,6 +63,7 @@ Tu único objetivo es:
 }
 
 🎯 Criterios estrictos:
+- Debes varias listas para las tareas que se van a generar
 - Cada lista debe tener al menos 4 tareas.
 - Cada tarea debe tener al menos 2 ítems en el checklist.
 - Las etiquetas no son opcionales: agrega al menos una por tarea según el contexto.
@@ -77,6 +78,9 @@ Recuerda: NO debes explicar el JSON, NO digas que estás generando un JSON, y NO
 
     # Obtener respuesta del modelo
     respuesta = llm.invoke(conversaciones[sesion_id])
+    # Si la respuesta contiene el JSON, eliminamos el historial para liberar memoria
+    if '{' in respuesta.content and 'listas' in respuesta.content:
+        del conversaciones[sesion_id]
     conversaciones[sesion_id].append(AIMessage(content=respuesta.content))
 
     return jsonify({"respuesta": respuesta.content})
